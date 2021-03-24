@@ -4,9 +4,9 @@ import CadastroFunc from './containers/cadastro';
 
 function App() {
   return (
-    <body>
+    <>
       <CadastroFunc />
-    </body>
+    </>
   );
 }
 
