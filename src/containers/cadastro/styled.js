@@ -8,15 +8,19 @@ export const Cadastro = styled.div `
   align-items: center;
   width: inherit;
   height: 100vh;
-  box-sizing: border-box;
   background-color: white;
   border-radius: 8px;
+  color: ${theme.black};
   header {
     height: 8vh;
     background-color: ${theme.darkBlue};
     color: ${theme.white};
     width: 100%;
     display: flex;
+    @media(max-width: 510px) {
+      font-size: 3vw;
+      height: 7vh;
+    }
     h1{
         margin: auto;
         width: fit-content;
@@ -24,37 +28,49 @@ export const Cadastro = styled.div `
   }
   form {
     display: flex;
-    height: 60vh;
-    width: 50vw;
+    width: 70vw;
+    max-width: 600px; 
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-sizing: border-box;
+
     text-align: left;
     box-shadow: 5px 5px 30px #ddd, 0px 10px 20px #ccc;
     border-radius: 18px;
     padding: 30px;
+    @media(max-width: 510px) {
+      height: fit-content;
+      width: 80vw;
+    }
     label {
         align-self: flex-start;
         margin-bottom: 4px;
+        font-weight: 600;
     }
   }
   `
 export const FormContainer = styled.div`
-    padding-top: 150px;
+    padding-top: 120px;
+    display: flex;
+    justify-content: center;
+    @media(max-width: 510px) {
+      padding-top: 40px;
+  }
 `
 
 export const Input = styled.div `
   width: 100%;
   height: 40px;
-  border: 2px solid #111010;
-  box-shadow: rgba(17, 16, 16, 1) 4px 4px;
-  box-sizing: border-box;
+  border: 2px solid ${theme.black};
+  box-shadow: ${theme.black} 4px 4px;
   padding: 0 20px;
   margin: 0px 0px 22px 0px;
   display: flex;
   align-items: inherit;
   background-color: white;
+  :last-of-type {
+      margin-bottom: 40px;
+    }
   input {
     border: none;
     outline: none;
@@ -64,6 +80,27 @@ export const Input = styled.div `
   p {
     font-size:1.2rem;
     cursor: pointer;
-    color: #111010;
+  }
+`
+export const Button = styled.button `
+  width: fit-content;
+  height: 40px;
+  border: 2px solid #111010;
+  box-shadow: rgba(17, 16, 16, 1) 4px 4px;
+  outline: none;
+  padding: 0 20px;
+  display: flex;
+  align-items: inherit;
+  font-weight: 600;
+  background-color: white;
+  font-size: 1.3rem;
+  :hover {
+    cursor: pointer;
+    background-color: ${theme.lightBlue};
+  }
+  :active {
+    transform: translateY(3px);
+    transition: .15s;
+    box-shadow: rgba(17, 16, 16, 1) 1px 1px ;
   }
 `
