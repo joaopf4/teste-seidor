@@ -7,7 +7,7 @@ export const Cadastro = styled.div `
   flex-direction: column;
   align-items: center;
   width: inherit;
-  height: 100vh;
+  padding-bottom: 40px;
   background-color: white;
   border-radius: 8px;
   color: ${theme.black};
@@ -17,15 +17,19 @@ export const Cadastro = styled.div `
     color: ${theme.white};
     width: 100%;
     display: flex;
-    @media(max-width: 510px) {
-      font-size: 3vw;
-      height: 7vh;
+    @media(max-width: 540px) {
+      font-size: 2.5vw;
+      height: 10vh;
+      padding: 10px;
     }
     h1{
         margin: auto;
         width: fit-content;
     }
   }
+  h3 {
+      width: 70%;
+    }
   form {
     display: flex;
     width: 70vw;
@@ -38,7 +42,7 @@ export const Cadastro = styled.div `
     box-shadow: 5px 5px 30px #ddd, 0px 10px 20px #ccc;
     border-radius: 18px;
     padding: 30px;
-    @media(max-width: 510px) {
+    @media(max-width: 540px) {
       height: fit-content;
       width: 80vw;
     }
@@ -53,7 +57,7 @@ export const FormContainer = styled.div`
     padding-top: 120px;
     display: flex;
     justify-content: center;
-    @media(max-width: 510px) {
+    @media(max-width: 540px) {
       padding-top: 40px;
   }
 `
@@ -63,7 +67,7 @@ export const Input = styled.div `
   height: 40px;
   border: 2px solid ${theme.black};
   box-shadow: ${theme.black} 4px 4px;
-  padding: 0 20px;
+  padding: 0 10px;
   margin: 0px 0px 22px 0px;
   display: flex;
   align-items: inherit;
