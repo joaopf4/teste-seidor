@@ -14,14 +14,17 @@ function CadastroFunc() {
         descontoPrev: '',
         dependentes: ''
 
-    })
+    });
+    const [calculoFunc, setCalculoFunc] = React.useState(false);
+    const [salarioBase, setSalarioBase] = React.useState('');
+    const [descontoIR, setDescontoIR] = React.useState('');
 
     const handleChange = (e) => {
         const {id , value} = e.target   
         setState(prevState => ({
             ...prevState,
             [id] : value,
-        }))
+        }));
     }
     const handleCpfMask = (e) => {
         const {id, value} = e.target
@@ -37,15 +40,51 @@ function CadastroFunc() {
                 ...prevState,
                 [id] : value,
                 cpf: newCPF
-            })) 
+            })); 
         }           
     }
-
     const handleSubmit = (e) => {
         e.preventDefault();
+        setCalculoFunc(true);
+        const salario = Number(state.salarioBruto);
+        const desconto = Number(state.descontoPrev);
+        const dependentes = Number(state.dependentes);
+        const deducao = 164.56;      
+        
+        const salarioBaseIR = (salario - desconto) - (deducao * dependentes);
+        setSalarioBase(salarioBaseIR);
 
-        console.log(state);
-        console.log(state.nome);
+        let aliquota = 0;
+        let parcelaDeducao = 0;
+
+        if (salarioBaseIR <= 1903.98) {
+            aliquota = 0;
+            parcelaDeducao = 0;
+        } 
+        else if (salarioBaseIR > 1903.98 && salarioBaseIR <= 2826.65) {
+            parcelaDeducao = 142.8;
+            aliquota = 0.075;
+        } 
+        else if (salarioBaseIR > 2826.65 && salarioBaseIR <= 3751.05 ) {
+            parcelaDeducao = 354.80;
+            aliquota = 0.15;
+        }
+        else if (salarioBaseIR > 3751.05 && salarioBaseIR <= 4664.68 ) {
+            parcelaDeducao = 636.13;
+            aliquota = 0.225;
+        } 
+        else if (salarioBaseIR > 4664.68) {
+            parcelaDeducao = 869.36;
+            aliquota = 0.275;
+        }
+        const descontoIRRF = (salarioBaseIR * aliquota) - parcelaDeducao;
+        setDescontoIR(descontoIRRF);
+
+
+
+        console.log(`O salário base para cálculo do IR do funcionário ${state.nome} é de ${salarioBaseIR}, e seu desconto no IR é de ${descontoIRRF}`);
+
+        return descontoIRRF;
     }
 
 
@@ -87,7 +126,7 @@ function CadastroFunc() {
                             id="salarioBruto"
                             value={state.salarioBruto}
                             onChange={handleChange}
-                            placeholder="Só números"
+                            placeholder="Só numeros(0000.00)"
                         />
                     </Input>
                     <label htmlFor="descontoPrev">Desconto da previdência:</label>
@@ -99,7 +138,7 @@ function CadastroFunc() {
                             id="descontoPrev"
                             value={state.descontoPrev}
                             onChange={handleChange}
-                            placeholder="Só numeros"
+                            placeholder="Só numeros(0000.00)"
                         />
                     </Input>
                     <label htmlFor="dependentes">Número de dependentes:</label>
@@ -121,6 +160,12 @@ function CadastroFunc() {
                     </Button>
                 </form>
             </FormContainer>
+            {
+                calculoFunc &&
+                <h3>
+                    O salário base para cálculo do IR do funcionário {state.nome} é de R$ {salarioBase}, e seu desconto no IR é de R$ {descontoIR} 
+                </h3>
+            }
         </Cadastro>
     );
 }
