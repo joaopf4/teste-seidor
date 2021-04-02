@@ -54,7 +54,7 @@ export const Cadastro = styled.div `
   }
   `
 export const FormContainer = styled.div`
-    padding-top: 120px;
+    padding-top: 70px;
     display: flex;
     justify-content: center;
     @media(max-width: 540px) {
@@ -106,5 +106,26 @@ export const Button = styled.button `
     transform: translateY(3px);
     transition: .15s;
     box-shadow: rgba(17, 16, 16, 1) 1px 1px ;
+  }
+`
+export const TabelaFuncs = styled.table `
+  border-collapse: collapse;
+  width: 60%;
+  th{
+    padding: 12px 6px;
+    text-align: left;
+    background-color: ${theme.darkBlue};
+    color: ${theme.white};
+    border: 1px solid #ddd;
+  }
+  tr:nth-child(even){
+    background-color: #f2f2f2;
+  }
+  tr:hover {
+    background-color: #ddd;
+  }
+  td {
+    padding: 10px 0 10px 6px;
+    border: 1px solid #ddd;
   }
 `
