@@ -1,23 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Cadastro,
     Input,
     FormContainer,
-    Button
+    Button,
+    TabelaFuncs
 } from './styled';
 
 function CadastroFunc() {
-    const [state , setState] = React.useState({
+    const [state , setState] = useState({
         nome : '',
         cpf : '',
         salarioBruto: '',
         descontoPrev: '',
         dependentes: ''
-
     });
-    const [calculoFunc, setCalculoFunc] = React.useState(false);
-    const [salarioBase, setSalarioBase] = React.useState('');
-    const [descontoIR, setDescontoIR] = React.useState('');
+    const [calculoFunc, setCalculoFunc] = useState(false);
+    const [salarioBase, setSalarioBase] = useState('');
+    const [descontoIR, setDescontoIR] = useState('');
+    // const [funcionario, addFuncionario] = useState([
+    //     {
+    //         ...state,
+    //         salarioBase: '',
+    //         descontoIR: '',
+    //     }
+    // ]);
+
+
+    // useEffect(() => {
+    //     const funcionariosStorage = localStorage.getItem('funcionario');
+    //     if(funcionariosStorage){
+    //         addFuncionario(JSON.parse(funcionariosStorage));
+    //     }
+    //     return() => {}
+    // }, [])
+
+    // useEffect(() => {
+    //     localStorage.setItem('funcionario', JSON.stringify(funcionario))
+    // }, [funcionario]);
 
     const handleChange = (e) => {
         const {id , value} = e.target   
@@ -52,7 +72,7 @@ function CadastroFunc() {
         const deducao = 164.56;      
         
         const salarioBaseIR = (salario - desconto) - (deducao * dependentes);
-        setSalarioBase(salarioBaseIR);
+        setSalarioBase(salarioBaseIR.toFixed(2));
 
         let aliquota = 0;
         let parcelaDeducao = 0;
@@ -78,10 +98,7 @@ function CadastroFunc() {
             aliquota = 0.275;
         }
         const descontoIRRF = (salarioBaseIR * aliquota) - parcelaDeducao;
-        setDescontoIR(descontoIRRF);
-
-
-
+        setDescontoIR(descontoIRRF.toFixed(2));
         console.log(`O salário base para cálculo do IR do funcionário ${state.nome} é de ${salarioBaseIR}, e seu desconto no IR é de ${descontoIRRF}`);
 
         return descontoIRRF;
@@ -160,11 +177,49 @@ function CadastroFunc() {
                     </Button>
                 </form>
             </FormContainer>
-            {
-                calculoFunc &&
-                <h3>
-                    O salário base para cálculo do IR do funcionário {state.nome} é de R$ {salarioBase}, e seu desconto no IR é de R$ {descontoIR} 
-                </h3>
+            <h2>Seus funcionários: </h2>
+            {  !calculoFunc ?
+                <TabelaFuncs>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Salário</th>
+                        <th>Desconto</th>
+                        <th>Dependentes</th>
+                        <th>Base de cálculo</th>
+                        <th>Desconto IRRF</th>
+                        <th>Excluir</th>
+                    </tr> 
+                </TabelaFuncs>
+                :
+                <>
+                    <TabelaFuncs>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Salário</th>
+                            <th>Desconto</th>
+                            <th>Dependentes</th>
+                            <th>Base de cálculo</th>
+                            <th>Desconto IRRF</th>
+                            <th>Excluir</th>
+                        </tr>     
+                        <tr>
+                            <td>{state.nome}</td>
+                            <td>{state.cpf}</td>
+                            <td>{state.salarioBruto}</td>
+                            <td>{state.descontoPrev}</td>
+                            <td>{state.dependentes}</td>
+                            <td>{salarioBase}</td>
+                            <td>{descontoIR}</td>
+                            <td><button>X</button></td>
+                        </tr>
+                    </TabelaFuncs>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                </>
             }
         </Cadastro>
     );
