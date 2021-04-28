@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Cadastro,
     Input,
@@ -8,40 +8,21 @@ import {
 } from './styled';
 
 function CadastroFunc() {
-    const [state , setState] = useState({
+    const [funcionario, setFuncionario] = useState({
         nome : '',
         cpf : '',
-        salarioBruto: '',
-        descontoPrev: '',
-        dependentes: ''
+        salarioBruto: Number(''),
+        descontoPrev: Number(''),
+        dependentes: Number(''),
+        descontoIR: '',
+        salarioBase: '',
     });
     const [calculoFunc, setCalculoFunc] = useState(false);
-    const [salarioBase, setSalarioBase] = useState('');
-    const [descontoIR, setDescontoIR] = useState('');
-    // const [funcionario, addFuncionario] = useState([
-    //     {
-    //         ...state,
-    //         salarioBase: '',
-    //         descontoIR: '',
-    //     }
-    // ]);
-
-
-    // useEffect(() => {
-    //     const funcionariosStorage = localStorage.getItem('funcionario');
-    //     if(funcionariosStorage){
-    //         addFuncionario(JSON.parse(funcionariosStorage));
-    //     }
-    //     return() => {}
-    // }, [])
-
-    // useEffect(() => {
-    //     localStorage.setItem('funcionario', JSON.stringify(funcionario))
-    // }, [funcionario]);
-
+    const [listaFunc, setListaFunc] = useState([]);
+    
     const handleChange = (e) => {
         const {id , value} = e.target   
-        setState(prevState => ({
+        setFuncionario(prevState => ({
             ...prevState,
             [id] : value,
         }));
@@ -56,23 +37,37 @@ function CadastroFunc() {
         newCPF = newCPF.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); 
 
         if (newCPF.length < 15) {
-            setState (prevState => ({
+            setFuncionario (prevState => ({
                 ...prevState,
                 [id] : value,
                 cpf: newCPF
             })); 
         }           
     }
-    const handleSubmit = (e) => {
-        e.preventDefault();
+
+
+    //  useEffect(() => {
+    // //     const funcionariosStorage = localStorage.getItem('funcionario');
+    // //     if(funcionariosStorage){
+    // //         addFuncionario(JSON.parse(funcionariosStorage));
+    // //     }
+    // //     return() => {}
+    // }, [calculoFunc]);
+    async function salvaFunc(funcionario) {
+        // await calculaIR(funcionario);
+        setListaFunc([...listaFunc, funcionario])
+        console.log(listaFunc);
+
+    }
+
+    function calculaIR(funcionario) {
         setCalculoFunc(true);
-        const salario = Number(state.salarioBruto);
-        const desconto = Number(state.descontoPrev);
-        const dependentes = Number(state.dependentes);
-        const deducao = 164.56;      
-        
-        const salarioBaseIR = (salario - desconto) - (deducao * dependentes);
-        setSalarioBase(salarioBaseIR.toFixed(2));
+        const deducao = 164.56;
+        const salarioBaseIR = (funcionario.salarioBruto - funcionario.descontoPrev) - (deducao * funcionario.dependentes);
+        setFuncionario(prevState => ({
+            ...prevState,
+            salarioBase: salarioBaseIR
+        })); 
 
         let aliquota = 0;
         let parcelaDeducao = 0;
@@ -98,18 +93,29 @@ function CadastroFunc() {
             aliquota = 0.275;
         }
         const descontoIRRF = (salarioBaseIR * aliquota) - parcelaDeducao;
-        setDescontoIR(descontoIRRF.toFixed(2));
-        console.log(`O salário base para cálculo do IR do funcionário ${state.nome} é de ${salarioBaseIR}, e seu desconto no IR é de ${descontoIRRF}`);
-
+        setFuncionario(prevState => ({
+            ...prevState,
+            descontoIR: descontoIRRF.toFixed(2)
+        })); 
+        salvaFunc(funcionario);
+        console.log(descontoIRRF)
         return descontoIRRF;
     }
+    function cadastraFunc(e) {
+        e.preventDefault();
+        calculaIR(funcionario);
+        console.log(funcionario);
+        // console.log(`O salário base para cálculo do IR do funcionário ${funcionario.nome} é de ${salarioBaseIR}, e seu desconto no IR é de ${descontoIRRF}`);
+
+    }
+
 
 
     return (
         <Cadastro>
             <header><h1>Seidor - Cadastro de Funcionários</h1></header>
             <FormContainer>                
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={cadastraFunc}>
                     <label htmlFor="nome">Nome:</label>
                     <Input>
                         <input 
@@ -117,7 +123,7 @@ function CadastroFunc() {
                             required
                             type="text"
                             id="nome"
-                            value={state.nome}
+                            value={funcionario.nome}
                             onChange={handleChange}
                             placeholder="Nome"
                         />
@@ -129,7 +135,7 @@ function CadastroFunc() {
                             required
                             type="text"
                             id="cpf"
-                            value={state.cpf}
+                            value={funcionario.cpf}
                             onChange={handleCpfMask}
                             placeholder="000.000.000-00"
                         />
@@ -141,7 +147,7 @@ function CadastroFunc() {
                             required
                             type="number"
                             id="salarioBruto"
-                            value={state.salarioBruto}
+                            value={funcionario.salarioBruto}
                             onChange={handleChange}
                             placeholder="Só numeros(0000.00)"
                         />
@@ -153,7 +159,7 @@ function CadastroFunc() {
                             required
                             type="number"
                             id="descontoPrev"
-                            value={state.descontoPrev}
+                            value={funcionario.descontoPrev}
                             onChange={handleChange}
                             placeholder="Só numeros(0000.00)"
                         />
@@ -165,7 +171,7 @@ function CadastroFunc() {
                             required
                             type="number"
                             id="dependentes"
-                            value={state.dependentes}
+                            value={funcionario.dependentes}
                             onChange={handleChange}
                             placeholder="Só numeros"
                         />
@@ -177,6 +183,7 @@ function CadastroFunc() {
                     </Button>
                 </form>
             </FormContainer>
+
             <h2>Seus funcionários: </h2>
             {  !calculoFunc ?
                 <TabelaFuncs>
@@ -192,35 +199,34 @@ function CadastroFunc() {
                     </tr> 
                 </TabelaFuncs>
                 :
-                <>
-                    <TabelaFuncs>
-                        <tr>
-                            <th>Nome</th>
-                            <th>CPF</th>
-                            <th>Salário</th>
-                            <th>Desconto</th>
-                            <th>Dependentes</th>
-                            <th>Base de cálculo</th>
-                            <th>Desconto IRRF</th>
-                            <th>Excluir</th>
-                        </tr>     
-                        <tr>
-                            <td>{state.nome}</td>
-                            <td>{state.cpf}</td>
-                            <td>{state.salarioBruto}</td>
-                            <td>{state.descontoPrev}</td>
-                            <td>{state.dependentes}</td>
-                            <td>{salarioBase}</td>
-                            <td>{descontoIR}</td>
-                            <td><button>X</button></td>
-                        </tr>
-                    </TabelaFuncs>
-                    <br/>
-                    <br/>
-                    <br/>
-                    <br/>
-                </>
-            }
+                <TabelaFuncs>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Salário</th>
+                        <th>Desconto</th>
+                        <th>Dependentes</th>
+                        <th>Base de cálculo</th>
+                        <th>Desconto IRRF</th>
+                        <th>Excluir</th>
+                    </tr>     
+                    <tr>
+                        <td>{funcionario.nome}</td>
+                        <td>{funcionario.cpf}</td>
+                        <td>{funcionario.salarioBruto}</td>
+                        <td>{funcionario.descontoPrev}</td>
+                        <td>{funcionario.dependentes}</td>
+                        <td>{funcionario.salarioBase}</td>
+                        <td>{funcionario.descontoIR}</td>
+                        <td><button>X</button></td>
+                    </tr>
+                </TabelaFuncs>
+
+            }     
+            <br/>
+            <br/>
+            <br/>
+            <br/>
         </Cadastro>
     );
 }
