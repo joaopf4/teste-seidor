@@ -7,6 +7,7 @@ export const Cadastro = styled.div`
   align-items: center;
   width: inherit;
   padding-bottom: 40px;
+  justify-content: center;
   background-color: white;
   border-radius: 8px;
   color: ${theme.black};
@@ -110,9 +111,13 @@ export const Button = styled.button`
     box-shadow: rgba(17, 16, 16, 1) 1px 1px;
   }
 `;
+export const TableDiv = styled.div `
+  width: 80%;
+  overflow-x: auto;
+`
 export const TabelaFuncs = styled.table`
   border-collapse: collapse;
-  width: 60%;
+  width: 100%;
   th {
     padding: 12px 6px;
     text-align: left;
@@ -127,7 +132,11 @@ export const TabelaFuncs = styled.table`
     background-color: #ddd;
   }
   td {
-    padding: 10px 0 10px 6px;
+    padding: 10px 6px 10px 6px;
     border: 1px solid #ddd;
+    button {
+      display: block;
+      margin: auto;
+    }
   }
 `;
