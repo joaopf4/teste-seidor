@@ -1,8 +1,7 @@
-import styled from 'styled-components';
-import {theme} from "../../theme";
+import styled from "styled-components";
+import { theme } from "../../theme";
 
-
-export const Cadastro = styled.div `
+export const Cadastro = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,23 +16,26 @@ export const Cadastro = styled.div `
     color: ${theme.white};
     width: 100%;
     display: flex;
-    @media(max-width: 540px) {
+    @media (max-width: 540px) {
       font-size: 2.5vw;
       height: 10vh;
       padding: 10px;
     }
-    h1{
-        margin: auto;
-        width: fit-content;
+    h1 {
+      margin: auto;
+      width: fit-content;
     }
   }
+  h2 {
+    margin: 40px 0;
+  }
   h3 {
-      width: 70%;
-    }
+    width: 70%;
+  }
   form {
     display: flex;
     width: 70vw;
-    max-width: 600px; 
+    max-width: 600px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -42,27 +44,27 @@ export const Cadastro = styled.div `
     box-shadow: 5px 5px 30px #ddd, 0px 10px 20px #ccc;
     border-radius: 18px;
     padding: 30px;
-    @media(max-width: 540px) {
+    @media (max-width: 540px) {
       height: fit-content;
       width: 80vw;
     }
     label {
-        align-self: flex-start;
-        margin-bottom: 4px;
-        font-weight: 600;
+      align-self: flex-start;
+      margin-bottom: 4px;
+      font-weight: 600;
     }
   }
-  `
+`;
 export const FormContainer = styled.div`
-    padding-top: 70px;
-    display: flex;
-    justify-content: center;
-    @media(max-width: 540px) {
-      padding-top: 40px;
+  padding-top: 70px;
+  display: flex;
+  justify-content: center;
+  @media (max-width: 540px) {
+    padding-top: 40px;
   }
-`
+`;
 
-export const Input = styled.div `
+export const Input = styled.div`
   width: 100%;
   height: 40px;
   border: 2px solid ${theme.black};
@@ -73,20 +75,20 @@ export const Input = styled.div `
   align-items: inherit;
   background-color: white;
   :last-of-type {
-      margin-bottom: 40px;
-    }
+    margin-bottom: 40px;
+  }
   input {
     border: none;
     outline: none;
     width: 100%;
-    font-size: 1.3rem; 
+    font-size: 1.3rem;
   }
   p {
-    font-size:1.2rem;
+    font-size: 1.2rem;
     cursor: pointer;
   }
-`
-export const Button = styled.button `
+`;
+export const Button = styled.button`
   width: fit-content;
   height: 40px;
   border: 2px solid #111010;
@@ -104,21 +106,21 @@ export const Button = styled.button `
   }
   :active {
     transform: translateY(3px);
-    transition: .15s;
-    box-shadow: rgba(17, 16, 16, 1) 1px 1px ;
+    transition: 0.15s;
+    box-shadow: rgba(17, 16, 16, 1) 1px 1px;
   }
-`
-export const TabelaFuncs = styled.table `
+`;
+export const TabelaFuncs = styled.table`
   border-collapse: collapse;
   width: 60%;
-  th{
+  th {
     padding: 12px 6px;
     text-align: left;
     background-color: ${theme.darkBlue};
     color: ${theme.white};
     border: 1px solid #ddd;
   }
-  tr:nth-child(even){
+  tr:nth-child(even) {
     background-color: #f2f2f2;
   }
   tr:hover {
@@ -128,4 +130,4 @@ export const TabelaFuncs = styled.table `
     padding: 10px 0 10px 6px;
     border: 1px solid #ddd;
   }
-`
+`;

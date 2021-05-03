@@ -3,18 +3,14 @@ import { Cadastro, Input, FormContainer, Button, TabelaFuncs } from "./styled";
 import firebase from "./../../firebaseConnection";
 
 function CadastroFunc() {
-  const [funcionario, setFuncionario] = useState(
-    {
-      nome: "",
-      cpf: "",
-      salarioBruto: "",
-      descontoPrev: "",
-      dependentes: ""
-    }
-  );
-  const [calculoFunc, setCalculoFunc] = useState(false);
-  // const [listaFunc, setListaFunc] = useState([]);
-  // const listaFunc = useState([]);
+  const [funcionario, setFuncionario] = useState({
+    nome: "",
+    cpf: "",
+    salarioBruto: "",
+    descontoPrev: "",
+    dependentes: "",
+  });
+  const [listaFunc, setListaFunc] = useState([]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -41,21 +37,33 @@ function CadastroFunc() {
     }
   };
 
-  //  useEffect(() => {
-  // //     const funcionariosStorage = localStorage.getItem('funcionario');
-  // //     if(funcionariosStorage){
-  // //         addFuncionario(JSON.parse(funcionariosStorage));
-  // //     }
-  // //     return() => {}
-  // }, [calculoFunc]);
-  async function salvaFunc(funcionario) {
-    // await calculaIR(funcionario);
-    // setListaFunc([...listaFunc, funcionario]);
-    
-  }
+  useEffect(() => {
+    async function buscaFuncionarios() {
+      await firebase
+        .firestore()
+        .collection("funcionarios")
+        .onSnapshot((doc) => {
+          let lista = [];
+          doc.forEach((item) => {
+            lista.push({
+              id: item.id,
+              nome: item.data().nome,
+              cpf: item.data().cpf,
+              salarioBruto: item.data().salarioBruto,
+              descontoPrev: item.data().descontoPrev,
+              dependentes: item.data().dependentes,
+              salarioBase: item.data().salarioBase,
+              descontoIR: item.data().descontoIR,
+            })
+          })
+          setListaFunc(lista);
+          console.log(lista)
+        });
+    }
+    buscaFuncionarios();
+  }, []);
 
   async function calculaIR(funcionario) {
-    setCalculoFunc(true);
     const deducao = 164.56;
     const salarioBaseIR =
       funcionario.salarioBruto -
@@ -90,49 +98,69 @@ function CadastroFunc() {
       ...prevState,
       descontoIR: descontoIRRF.toFixed(2),
     }));
-    await firebase.firestore().collection('funcionarios')
-    .doc(funcionario.cpf)
-    .set({
-      ...funcionario,
-      descontoIR: descontoIRRF,
-      salarioBase: salarioBaseIR,
-    })
-    // salvaFunc(funcionario);
-    console.log(descontoIRRF);
+    await firebase
+      .firestore()
+      .collection("funcionarios")
+      .doc(funcionario.cpf)
+      .set({
+        ...funcionario,
+        descontoIR: descontoIRRF.toFixed(2),
+        salarioBase: salarioBaseIR,
+      });
+
     return descontoIRRF;
   }
+
+  async function excluirFuncionario(id) {
+    if (window.confirm('Deseja exlcuir este funcionário da lista?')) {
+      await firebase
+        .firestore()
+        .collection("funcionarios")
+        .doc(id)
+        .delete()
+        .then(() => {
+          alert("Funcionário excluído");
+        });
+    }
+  }
+
   async function cadastraFuncionario(e) {
     e.preventDefault();
+    const funcCadastrado = listaFunc.some(
+      (func) => func.id === funcionario.cpf
+    );
+
+    if (funcCadastrado) {
+      alert("este cpf já está cadastrado!");
+      return;
+    }
+
     await firebase
-    .firestore()
-    .collection('funcionarios')
-    .doc(funcionario.cpf)
-    .set({
-      nome: funcionario.nome,
-      cpf: funcionario.cpf,
-      salarioBruto: Number(funcionario.salarioBruto),
-      descontoPrev: Number(funcionario.descontoPrev),
-      dependentes: Number(funcionario.dependentes),
-    })
-    .then(async () => {
-      console.log('funcionario inserido com sucesso');
-      await firebase
       .firestore()
-      .collection('funcionarios')
+      .collection("funcionarios")
       .doc(funcionario.cpf)
-      .get()
-      .then((snapshot) => {
-        console.log(snapshot.data());
-        calculaIR(snapshot.data());
-
+      .set({
+        nome: funcionario.nome,
+        cpf: funcionario.cpf,
+        salarioBruto: Number(funcionario.salarioBruto),
+        descontoPrev: Number(funcionario.descontoPrev),
+        dependentes: Number(funcionario.dependentes),
       })
-
-    })
-    .catch((error) => {
-      console.log("rolou errro", error);
-    })
-
-    // console.log(`O salário base para cálculo do IR do funcionário ${funcionario.nome} é de ${salarioBaseIR}, e seu desconto no IR é de ${descontoIRRF}`);
+      .then(async () => {
+        console.log("funcionario inserido com sucesso");
+        await firebase
+          .firestore()
+          .collection("funcionarios")
+          .doc(funcionario.cpf)
+          .get()
+          .then((snapshot) => {
+            console.log(snapshot.data());
+            calculaIR(snapshot.data());
+          });
+      })
+      .catch((error) => {
+        console.log("rolou errro", error);
+      });
   }
 
   return (
@@ -207,8 +235,9 @@ function CadastroFunc() {
       </FormContainer>
 
       <h2>Seus funcionários: </h2>
-      {!calculoFunc ? (
-        <TabelaFuncs>
+
+      <TabelaFuncs>
+        <thead>
           <tr>
             <th>Nome</th>
             <th>CPF</th>
@@ -219,33 +248,28 @@ function CadastroFunc() {
             <th>Desconto IRRF</th>
             <th>Excluir</th>
           </tr>
-        </TabelaFuncs>
-      ) : (
-        <TabelaFuncs>
-          <tr>
-            <th>Nome</th>
-            <th>CPF</th>
-            <th>Salário</th>
-            <th>Desconto</th>
-            <th>Dependentes</th>
-            <th>Base de cálculo</th>
-            <th>Desconto IRRF</th>
-            <th>Excluir</th>
-          </tr>
-          <tr>
-            <td>{funcionario.nome}</td>
-            <td>{funcionario.cpf}</td>
-            <td>{funcionario.salarioBruto}</td>
-            <td>{funcionario.descontoPrev}</td>
-            <td>{funcionario.dependentes}</td>
-            <td>{funcionario.salarioBase}</td>
-            <td>{funcionario.descontoIR}</td>
-            <td>
-              <button>X</button>
-            </td>
-          </tr>
-        </TabelaFuncs>
-      )}
+        </thead>
+        {listaFunc.length !== 0 && (
+          <tbody>
+            {listaFunc.map((func) => {
+              return (
+                <tr key={func.id}>
+                  <td>{func.nome}</td>
+                  <td>{func.cpf}</td>
+                  <td>{func.salarioBruto}</td>
+                  <td>{func.descontoPrev}</td>
+                  <td>{func.dependentes}</td>
+                  <td>{func.salarioBase}</td>
+                  <td>{func.descontoIR}</td>
+                  <td>
+                    <button onClick={() => excluirFuncionario(func.id)}>X</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        )}
+      </TabelaFuncs>
       <br />
       <br />
       <br />
