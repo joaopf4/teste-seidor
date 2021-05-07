@@ -1,13 +1,53 @@
 import { TabelaFuncs, TableDiv } from "./styled";
+import { toast } from "react-toastify";
+import firebase from "./../../firebaseConnection"
 
 export default function Tabela({
   listaFunc,
   edit,
-  editarFuncionario,
   setEdit,
   setFuncionario,
-  excluirFuncionario,
 }) {
+
+  async function excluirFuncionario(id) {
+    if (window.confirm('Deseja exlcuir este funcionário da lista?')) {
+      setEdit(false);
+      setFuncionario({
+        nome:'',
+        cpf:'',
+        salarioBruto:'',
+        descontoPrev:'',
+        dependentes:''
+      });
+      await firebase
+        .firestore()
+        .collection("funcionarios")
+        .doc(id)
+        .delete()
+        .then(() => {
+          toast.info("Funcionário excluído");
+        });
+    }
+  };
+
+  async function editarFuncionario(id) {
+    setEdit(true);
+    await firebase
+    .firestore()
+    .collection("funcionarios")
+    .doc(id)
+    .get()
+    .then((snapshot) => {
+      setFuncionario({
+        nome: snapshot.data().nome,
+        cpf: snapshot.data().cpf,
+        salarioBruto: snapshot.data().salarioBruto,
+        descontoPrev: snapshot.data().descontoPrev,
+        dependentes: snapshot.data().dependentes
+      })
+    })
+  }
+
   return (
     <TableDiv>
       <TabelaFuncs>

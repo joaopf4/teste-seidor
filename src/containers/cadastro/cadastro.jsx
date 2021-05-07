@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Cadastro } from "./styled";
 import firebase from "./../../firebaseConnection";
-import { toast } from "react-toastify";
 import Tabela from "../../components/Tabela"
 import FormCadastro from "../../components/FormCadastro/formCadastro";
 
@@ -15,32 +14,6 @@ function CadastroFunc() {
   });
   const [listaFunc, setListaFunc] = useState([]);
   const [edit, setEdit] = useState(false);
-
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFuncionario((prevState) => ({
-      ...prevState,
-      [id]: value,
-    }));
-  };
-
-  const handleCpfMask = (e) => {
-    const { id, value } = e.target;
-
-    let newCPF = value;
-    newCPF = newCPF.replace(/\D/g, "");
-    newCPF = newCPF.replace(/(\d{3})(\d)/, "$1.$2");
-    newCPF = newCPF.replace(/(\d{3})(\d)/, "$1.$2");
-    newCPF = newCPF.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-
-    if (newCPF.length < 15) {
-      setFuncionario((prevState) => ({
-        ...prevState,
-        [id]: value,
-        cpf: newCPF,
-      }));
-    }
-  };
 
   useEffect(() => {
     async function buscaFuncionarios() {
@@ -115,132 +88,18 @@ function CadastroFunc() {
     return descontoIRRF;
   };
 
-  async function excluirFuncionario(id) {
-    if (window.confirm('Deseja exlcuir este funcionário da lista?')) {
-      setEdit(false);
-      setFuncionario({
-        nome:'',
-        cpf:'',
-        salarioBruto:'',
-        descontoPrev:'',
-        dependentes:''
-      });
-      await firebase
-        .firestore()
-        .collection("funcionarios")
-        .doc(id)
-        .delete()
-        .then(() => {
-          toast.info("Funcionário excluído");
-        });
-    }
-  };
-
-  async function cadastraFuncionario(e) {
-    e.preventDefault();
-    const funcCadastrado = listaFunc.some(
-      (func) => func.id === funcionario.cpf
-    );
-
-    if (funcCadastrado) {
-      toast.warning("Este cpf já está cadastrado!");
-      return;
-    }
-
-    await firebase
-      .firestore()
-      .collection("funcionarios")
-      .doc(funcionario.cpf)
-      .set({
-        nome: funcionario.nome,
-        cpf: funcionario.cpf,
-        salarioBruto: Number(funcionario.salarioBruto),
-        descontoPrev: Number(funcionario.descontoPrev),
-        dependentes: Number(funcionario.dependentes),
-      })
-      .then(async () => {
-        await firebase
-        .firestore()
-        .collection("funcionarios")
-        .doc(funcionario.cpf)
-        .get()
-        .then((snapshot) => {
-          calculaIR(snapshot.data());
-        });
-        setFuncionario({
-          nome:'',
-          cpf:'',
-          salarioBruto:'',
-          descontoPrev:'',
-          dependentes:''
-        });
-        toast.success("Funcionario inserido com sucesso!");
-      })
-      .catch((error) => {
-        toast.error("Não foi possível cadastrar o funcionário.", error);
-      });
-  };
-
-  async function efetuarEdicao(e) {
-    e.preventDefault();
-    await firebase
-    .firestore()
-    .collection("funcionarios")
-    .doc(funcionario.cpf)
-    .update({
-      nome: funcionario.nome,
-      cpf: funcionario.cpf,
-      salarioBruto: funcionario.salarioBruto,
-      descontoPrev: funcionario.descontoPrev,
-      dependentes: funcionario.dependentes
-    })
-    .then(() => {
-      calculaIR(funcionario);
-      setFuncionario({
-        nome:'',
-        cpf:'',
-        salarioBruto:'',
-        descontoPrev:'',
-        dependentes:''
-      })
-      toast.success('Funcionário atualizado com sucesso');
-      setEdit(!edit);
-    })
-    .catch(() => {
-      toast.error('Erro ao atualizar funcionário. O seu cpf não pode ser alterado');
-    })
-  }
-
-  async function editarFuncionario(id) {
-    setEdit(true);
-    await firebase
-    .firestore()
-    .collection("funcionarios")
-    .doc(id)
-    .get()
-    .then((snapshot) => {
-      setFuncionario({
-        nome: snapshot.data().nome,
-        cpf: snapshot.data().cpf,
-        salarioBruto: snapshot.data().salarioBruto,
-        descontoPrev: snapshot.data().descontoPrev,
-        dependentes: snapshot.data().dependentes
-      })
-    })
-  }
-
   return (
     <Cadastro>
       <header>
         <h1>Seidor - Cadastro de Funcionários</h1>
       </header>
       <FormCadastro 
-          handleCpfMask={handleCpfMask}
           edit={edit}
-          cadastraFuncionario={cadastraFuncionario}
-          efetuarEdicao={efetuarEdicao}
           funcionario={funcionario}
-          handleChange={handleChange}
+          setFuncionario={setFuncionario}
+          calculaIR={calculaIR}
+          setEdit={setEdit}
+          listaFunc={listaFunc}
       />
 
       <h2>Seus funcionários: </h2>
@@ -248,12 +107,10 @@ function CadastroFunc() {
       <Tabela 
         listaFunc={listaFunc}
         edit={edit}
-        editarFuncionario={editarFuncionario}
         setEdit={setEdit}
         setFuncionario={setFuncionario}
-        excluirFuncionario={excluirFuncionario}
       />
-      <br />
+
       <br />
       <br />
       <br />
