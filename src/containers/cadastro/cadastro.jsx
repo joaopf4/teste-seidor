@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Cadastro, Input, FormContainer, Button, TabelaFuncs, TableDiv } from "./styled";
+import { Cadastro } from "./styled";
 import firebase from "./../../firebaseConnection";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import Tabela from "../../components/Tabela"
+import FormCadastro from "../../components/FormCadastro/formCadastro";
 
 function CadastroFunc() {
   const [funcionario, setFuncionario] = useState({
@@ -232,128 +234,25 @@ function CadastroFunc() {
       <header>
         <h1>Seidor - Cadastro de Funcionários</h1>
       </header>
-      <FormContainer>
-        <form onSubmit={!edit ? cadastraFuncionario : efetuarEdicao}>
-          <label htmlFor="nome">Nome:</label>
-          <Input>
-            <input
-              name="nome"
-              required
-              type="text"
-              id="nome"
-              value={funcionario.nome}
-              onChange={handleChange}
-              placeholder="Nome"
-            />
-          </Input>
-          <label htmlFor="cpf">CPF:</label>
-          <Input>
-            <input
-              name="cpf"
-              required
-              type="text"
-              id="cpf"
-              value={funcionario.cpf}
-              onChange={handleCpfMask}
-              placeholder="000.000.000-00"
-            />
-          </Input>
-          <label htmlFor="salarioBruto">Salário Bruto:</label>
-          <Input>
-            <input
-              name="salarioBruto"
-              required
-              type="number"
-              id="salarioBruto"
-              value={funcionario.salarioBruto}
-              onChange={handleChange}
-              placeholder="Só numeros(0000.00)"
-            />
-          </Input>
-          <label htmlFor="descontoPrev">Desconto da previdência:</label>
-          <Input>
-            <input
-              name="descontoPrev"
-              required
-              type="number"
-              id="descontoPrev"
-              value={funcionario.descontoPrev}
-              onChange={handleChange}
-              placeholder="Só numeros(0000.00)"
-            />
-          </Input>
-          <label htmlFor="dependentes">Número de dependentes:</label>
-          <Input>
-            <input
-              name="dependentes"
-              required
-              type="number"
-              id="dependentes"
-              value={funcionario.dependentes}
-              onChange={handleChange}
-              placeholder="Só numeros"
-            />
-          </Input>
-          <Button type="submit">{!edit ? 'Cadastrar' : 'Editar'}</Button>
-        </form>
-      </FormContainer>
+      <FormCadastro 
+          handleCpfMask={handleCpfMask}
+          edit={edit}
+          cadastraFuncionario={cadastraFuncionario}
+          efetuarEdicao={efetuarEdicao}
+          funcionario={funcionario}
+          handleChange={handleChange}
+      />
 
       <h2>Seus funcionários: </h2>
-      <TableDiv>
-        <TabelaFuncs>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>CPF</th>
-              <th>Salário</th>
-              <th>Desconto</th>
-              <th>Dependentes</th>
-              <th>Base de cálculo</th>
-              <th>Desconto IRRF</th>
-              <th>Editar</th>
-              <th>Excluir</th>
-            </tr>
-          </thead>
-          {listaFunc.length !== 0 && (
-            <tbody>
-              {listaFunc.map((func) => {
-                return (
-                  <tr key={func.id}>
-                    <td>{func.nome}</td>
-                    <td>{func.cpf}</td>
-                    <td>{func.salarioBruto}</td>
-                    <td>{func.descontoPrev}</td>
-                    <td>{func.dependentes}</td>
-                    <td>{func.salarioBase}</td>
-                    <td>{func.descontoIR}</td>
-                    <td>
-                      { !edit ? 
-                        <button onClick={() => editarFuncionario(func.id)}>Editar</button>
-                        
-                        :<button onClick={
-                          () => {
-                            setEdit(false);
-                            setFuncionario({
-                              nome:'',
-                              cpf:'',
-                              salarioBruto:'',
-                              descontoPrev:'',
-                              dependentes:''
-                            });
-                          }
-                        }>Cancelar</button>
-                      }
-                    </td>
-                    <td>
-                      <button onClick={() => excluirFuncionario(func.id)}>X</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          )}
-        </TabelaFuncs>
-      </TableDiv>
+
+      <Tabela 
+        listaFunc={listaFunc}
+        edit={edit}
+        editarFuncionario={editarFuncionario}
+        setEdit={setEdit}
+        setFuncionario={setFuncionario}
+        excluirFuncionario={excluirFuncionario}
+      />
       <br />
       <br />
       <br />
